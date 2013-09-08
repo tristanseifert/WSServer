@@ -11,5 +11,7 @@
 
 void util_string_trim(char* string);
 char *util_config_strip_quotes(char *string);
+char* util_base64_encode(const unsigned char* input, int length);
+char* util_sha1(char* data, int length);
 
 #endif

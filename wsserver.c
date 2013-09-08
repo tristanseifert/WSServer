@@ -5,6 +5,8 @@
 
 #include "config_parser.h"
 #include "socket_handler.h"
+#include "ws_protocol.h"
+#include "http_protocol.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,6 +76,14 @@ int main(int argc, const char* argv[]) {
     
     socket_handler_init(connection);
     printf("Server is ready. Waiting for connections.\n");
+
+    // Test accept header calculation
+	WS_Client *client = malloc(sizeof(*client));
+    char* test_headers = "GET /mychat HTTP/1.1\r\nHost: server.example.com\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Key: x3JJHMbDL1EzLkh9GBhXDw==\r\nSec-WebSocket-Protocol: chat\r\nSec-WebSocket-Version: 13\r\nOrigin: http://example.com\r\n";
+    http_parse_headers(test_headers, client);
+
+	ws_calculate_accept(client);
+	printf("Accept: %s\n", client->ws_accept);
     
     // Go into an infinite loop here
     while(1) {

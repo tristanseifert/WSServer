@@ -2,10 +2,23 @@
 # server executable.
 #
 CC=gcc
-CCFLAGS=-g -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-format -Wno-unused-variable -std=gnu99 -L/usr/lib -pthread
+CCFLAGS=-g -Wno-deprecated-declarations -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -Wno-format -Wno-unused-variable -std=gnu99 -L/usr/lib
 CCOPT_SO=$(CCFLAGS) -fpic
 CCOPT_EXE=$(CCFLAGS)
 
+LIBS = -ldl -lssl -pthread
+
+#
+# Link against libcrypto on OS X
+#
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+	LIBS += -lcrypto
+endif
+
+#
+# Directory in which plugins are compiled
+#
 PLUGIN_DIR = plugins
 
 all: wsserver $(PLUGIN_DIR)/echo.so
@@ -23,8 +36,8 @@ WSSERVER_H=$(wildcard *.h)
 # Link with --export-dynamic, so that public symbols will be exposed
 # to plugins.
 #
-wsserver: wsserver.o plugin_manager.o plugin_discovery.o config_parser.o util.o socket_handler.o
-	$(CC) -o $@ $^ -I. -ldl -Wl #,--export-dynamic
+wsserver: wsserver.o plugin_manager.o plugin_discovery.o config_parser.o util.o socket_handler.o ws_protocol.o http_protocol.o
+	$(CC) -o $@ $^ -I. $(LIBS) -Wl
 
 #
 # Plugins

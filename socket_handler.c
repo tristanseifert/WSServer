@@ -86,7 +86,9 @@ int socket_handler_get_connection(int sock) {
 }
 
 /*
- * Thread spawned for each client that connects.
+ * Thread spawned for each client that connects. Searches for the plugin to
+ * handle the endpoint, then hands over the processing of the client to it in
+ * this thread.
  */
 void *socket_handler_connection_handler(void *connection) {
     if(connection == NULL) return NULL;
